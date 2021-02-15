@@ -1,5 +1,11 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableWithoutFeedback, Image} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableWithoutFeedback,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import Video from 'react-native-video';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -9,11 +15,21 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import styles from './styles';
 
 const Post = (props) => {
-  const {post} = props;
+  const [post, setPost] = useState(props.post);
   const [paused, setPaused] = useState(false);
+  const [isLiked, setisLiked] = useState(false);
 
   const onPlayPausePress = () => {
     setPaused(!paused);
+  };
+
+  const onLikePress = () => {
+    const likesToAdd = isLiked ? -1 : 1;
+    setPost({
+        ...post,
+        likes: post.likes + likesToAdd,
+    });
+    setisLiked(!isLiked)
   };
   return (
     <View style={styles.container}>
@@ -22,7 +38,7 @@ const Post = (props) => {
           <Video
             source={{uri: post.videoUri}}
             style={styles.video}
-            onError={(e: LoadError) => console.log(e)}
+            onError={(e) => console.log(e)}
             resizeMode={'cover'}
             repeat={true}
             paused={paused}
@@ -33,10 +49,12 @@ const Post = (props) => {
                 style={styles.profilePicture}
                 source={{uri: post.user.imageUri}}
               />
-              <View style={styles.verticalIcon}>
-                <AntDesign name={'heart'} size={40} color="white" />
+              <TouchableOpacity
+                style={styles.verticalIcon}
+                onPress={onLikePress}>
+                <AntDesign name={'heart'} size={40} color={isLiked ? 'red' : 'white'} />
                 <Text style={styles.iconLabel}>{post.likes}</Text>
-              </View>
+              </TouchableOpacity>
               <View style={styles.verticalIcon}>
                 <FontAwesome name={'commenting'} size={40} color="white" />
                 <Text style={styles.iconLabel}>{post.comments}</Text>
